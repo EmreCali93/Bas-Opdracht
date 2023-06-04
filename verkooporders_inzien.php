@@ -19,10 +19,10 @@ try {
     if ($stmt->rowCount() > 0) {
         // Resultaten ophalen en weergeven
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $orderID = $row['orderID'];
-            $klantID = $row['klantID'];
-            $product = $row['product'];
-            $aantal = $row['aantal'];
+            $orderID = $_POST['orderID'] ?? null;
+            $klantID = $_POST['klantID'] ?? null;
+            $product = $_POST['product'] ?? null;
+            $aantal = $_POST['aantal'] ?? null;
 
             // Verdere verwerking of weergave van de verkoopordergegevens
             echo "Order ID: " . $orderID . "<br>";

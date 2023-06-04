@@ -10,14 +10,16 @@ class Verkooporder {
         $this->conn = $conn;
     }
 
-    public function getVerkoopordersByKlantId($klantid) {
+    public function getVerkoopordersByCriteria($klantid, $artikelid) {
         try {
             $query = "SELECT v.verkordid, v.artid, v.klantid, v.verkorddatum, v.verkordbestaantal, v.verkordstatus, a.artikelenomschrijving
                       FROM verkooporders v
                       INNER JOIN artikelen a ON v.artid = a.artId
-                      WHERE v.klantid = :klantid";
+                      WHERE (:klantid IS NULL OR v.klantid = :klantid)
+                      AND (:artikelid IS NULL OR v.artid = :artikelid)";
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':klantid', $klantid);
+            $stmt->bindParam(':artikelid', $artikelid);
             $stmt->execute();
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
             return $result;
@@ -38,14 +40,27 @@ class Verkooporder {
         }
     }
 
+    public function getArtikelen() {
+        try {
+            $query = "SELECT artId, artikelenomschrijving FROM artikelen";
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute();
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            return $result;
+        } catch(PDOException $e) {
+            echo "Fout bij het ophalen van de artikelen: " . $e->getMessage();
+        }
+    }
+
 }
 
 $verkooporder = new Verkooporder($conn);
 
 // Zoekbalk logica
 if (isset($_POST['search'])) {
-    $klantid = $_POST['klantid'] ?? '';
-    $verkooporders = $verkooporder->getVerkoopordersByKlantId($klantid);
+    $klantid = $_POST['klantid'] ?? null;
+    $artikelid = $_POST['artikelid'] ?? null;
+    $verkooporders = $verkooporder->getVerkoopordersByCriteria($klantid, $artikelid);
 
     if (!empty($verkooporders)) {
         echo "<table>
@@ -73,12 +88,13 @@ if (isset($_POST['search'])) {
 
         echo "</table>";
     } else {
-        echo "Geen verkooporders gevonden voor de geselecteerde klant.";
+        echo "Geen verkooporders gevonden voor de geselecteerde criteria.";
     }
 }
 
-// Klanten ophalen voor het dropdown-menu
+// Klanten en artikelen ophalen voor de dropdown-menu's
 $klanten = $verkooporder->getKlanten();
+$artikelen = $verkooporder->getArtikelen();
 ?>
 
 <!DOCTYPE html>
@@ -86,9 +102,18 @@ $klanten = $verkooporder->getKlanten();
 <body>
     <form method="POST" action="">
         <label for="klantid">Klant:</label>
-        <select name="klantid" id="klantid" required>
+        <select name="klantid" id="klantid">
+            <option value="">Alle klanten</option>
             <?php foreach ($klanten as $klant) { ?>
                 <option value="<?php echo $klant['klantId']; ?>"><?php echo $klant['klantNaam']; ?></option>
+            <?php } ?>
+        </select>
+        <br>
+        <label for="artikelid">Artikel:</label>
+        <select name="artikelid" id="artikelid">
+            <option value="">Alle artikelen</option>
+            <?php foreach ($artikelen as $artikel) { ?>
+                <option value="<?php echo $artikel['artId']; ?>"><?php echo $artikel['artikelenomschrijving']; ?></option>
             <?php } ?>
         </select>
         <br>
