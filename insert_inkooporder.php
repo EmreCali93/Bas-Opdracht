@@ -57,6 +57,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["insert"]) && $_POST["i
 
 $inkooporder = new Inkooporder($conn);
 $leveranciers = $inkooporder->getLeveranciers();
+
 ?>
 
 <!DOCTYPE html>
