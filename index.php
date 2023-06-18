@@ -67,7 +67,6 @@
             <li><a href="insert_inkooporder.php">Inkooporder toevoegen</a></li>
             <li><a href="insert_verkooporder.php">Verkooporder toevoegen</a></li>
             <li><a href="klant_select.php">Klant selecteren</a></li>
-            <li><a href="klantformulier.php">Klantformulier</a></li>
             <li><a href="select_verkooporder.php">Verkooporder selecteren</a></li>
             <li><a href="update_orderstatus.php">Orderstatus bijwerken</a></li>
             <li><a href="verkooporder.php">Verkooporder</a></li>
